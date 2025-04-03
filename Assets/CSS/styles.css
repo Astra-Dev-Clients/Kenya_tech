@@ -1885,12 +1885,12 @@ body{
 .customer-logos {
   margin: auto;
   width: 90%;
-  overflow: hidden;
-  padding: 15px 0;
+  overflow:hidden;
+  padding: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
+  /* flex-wrap: nowrap; */
   gap: 40px;
   position: relative;
   z-index: 1;
