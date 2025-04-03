@@ -1880,3 +1880,34 @@ body{
 }
 
 
+/* partners */
+
+.customer-logos {
+  margin: auto;
+  width: 90%;
+  overflow: hidden;
+  padding: 15px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+
+.customer-logos .slide img {
+  width: 100px; /* Adjust logo size */
+  height: auto;
+  filter: grayscale(100%);
+  transition: 0.3s;
+}
+
+.customer-logos .slide img:hover {
+  filter: grayscale(0%);
+  transform: scale(1.1);
+}

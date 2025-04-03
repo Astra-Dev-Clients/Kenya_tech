@@ -15,3 +15,7 @@ rainOff.addEventListener('click', (e) =>{
     rainOn.style.display ="block";
     rainOff.style.display ="none";
 });
+
+
+// our partners
+
