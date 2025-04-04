@@ -36,7 +36,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 
-<body class="bg-light">
+<body class="bg-light container-fluid">
 <!-- Header -->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container">
@@ -181,7 +181,7 @@
                     <!-- Description -->
                     <p class="max-w-lg  text-start text-slate-800/50">At Kenya Tech Events, we are dedicated to fostering innovation and collaboration within Kenya's vibrant tech ecosystem. Our platform brings together the best tech conferences, workshops, hackathons, and networking events across the country, making it easy for tech enthusiasts, professionals, and innovators to stay connected.</p>
                     <!-- Button Call to Action -->
-                    <a class="btn btn-lg w-50 text-white d-flex align-items-center justify-content-center" href="#contact" style="background-color: #061a60; text-decoration: none;">Be Part of Our Community</a>
+                    <a class="btn btn-lg w-50 text-white d-flex align-items-center justify-content-center" href="#contact" style="background-color: #061a60; text-decoration: none;">Join Our Community</a>
                 </div>
             </div>
         </div>
