@@ -1,53 +1,8 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-use Dotenv\Dotenv;
 
-include '../vendor/autoload.php';
-require_once '../Database/db.php';
 
-session_start();
 
-$dotenv = Dotenv::createImmutable('../');
-$dotenv->load();
 
-$client = new Google\Client;
-$client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
-$client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
-$client->setRedirectUri($_ENV['GOOGLE_REDIRECT_URI']);
-$client->addScope("email");
-$client->addScope("profile");
-$url = $client->createAuthUrl();
-
-$MS_clientId = $_ENV['MICROSOFT_CLIENT_ID'];
-$MS_redirectUri = $_ENV['MICROSOFT_REDIRECT_URI'];
-
-if (isset($_POST['login-email'])) {
-    $email = $_POST['email'];
-    $pass = $_POST['pass'];
-    $sql = "SELECT * FROM users WHERE email = ? AND User_Role = 'user'";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-        if (password_verify($pass, $user['Pass'])) {
-            $_SESSION['email'] = $user['Email'];
-            $_SESSION['name'] = $user['First_Name'] . ' ' . $user['Last_Name'];
-            $_SESSION['id'] = $user['SN'];
-            $_SESSION['avatar'] = $user['Avatar'];
-            $_SESSION['email_auth'] = $user['SN'];
-            header('location: ../portal/home.php');
-            exit();
-        } else {
-            echo "<script>alert('Incorrect email or password');</script>";
-        }
-    } else {
-        echo "<script>alert('Incorrect email or password');</script>";
-    }
-}
 ?>
 
 <!DOCTYPE html>

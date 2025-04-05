@@ -1,3 +1,27 @@
+<?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+use Dotenv\Dotenv;
+
+include './vendor/autoload.php';
+require_once './Database/db.php';
+
+session_start();
+
+$dotenv = Dotenv::createImmutable('./');
+$dotenv->load();
+
+$client = new Google\Client;
+$client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
+$client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
+$client->setRedirectUri($_ENV['GOOGLE_REDIRECT_URI']);
+$client->addScope("email");
+$client->addScope("profile");
+$url = $client->createAuthUrl();
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -29,6 +53,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
 
 
+    <link rel="stylesheet" href="./Assets/CSS/rotate.css">
+
     
 
      <!-- include font-awesome -->
@@ -38,7 +64,7 @@
 
 <body class="bg-light container-fluid">
 <!-- Header -->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top position-sticky">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center justify-content-center" href="#"> <img src="Assets/Img/logo-1.png" alt="" class="img-fluid me-2" style="width: 39px; height: auto;"> <div class="d-flex flex-column">Kenya Tech Events<br><small style="font-size: x-small;">Shaping Kenya's Digital Future</small></div> </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,18 +103,59 @@
                         <a class="nav-link" href="#">Resources</a>
                     </li>
                 </ul>
-                <a href="#" class="btn text-white" style="background-color:#061a60;">Get Started</a>
+                <a href="<?=$url?>" class="btn text-white" style="background-color:#061a60;">Get Started</a>
             </div>
         </div>
     </nav>
  
     <!-- Hero Section -->
-    <div class="container-fluid hero position-relative" style="background: rgb(255,255,255);
-      background: linear-gradient(73deg, rgba(255,255,255,1) 8%, #061a6058 87%);">
+    <div class="container-fluid hero position-relative " style="background: rgb(255,255,255);
+      background: linear-gradient(73deg, rgba(255,255,255,1) 8%, #061a6058 87%); height: 100vh;">
       <div class="overlay"></div>
+
+            <!-- overlay -->
+            <section class="main-container">
+                <div class="main">
+                  <div class="big-circle">
+                    <div class="icon-block">
+                      <img src="./assets/img/logos/html.png" alt="web design icon" />
+                    </div>
+                    <div class="icon-block">
+                      <img src="./assets/img/logos/python.png" alt="game design icon" />
+                    </div>
+                    <div class="icon-block">
+                      <img src="./assets/img/logos/css.png" alt="game dev icon" />
+                    </div>
+                    <div class="icon-block">
+                      <img src="./assets/img/logos/c++.png" alt="ui-ux icon" />
+                    </div>
+                  </div>
+                  <div class="circle">
+                    <div class="icon-block">
+                      <img src="./assets/img/logos/java.png" alt="app icon" />
+                    </div>
+                    <div class="icon-block">
+                      <img src="./assets/img/logos/chatgpt.png" alt="blockchain icon" />
+                    </div>
+                    <div class="icon-block">
+                      <img src="./assets/img/logos/kotlin.png" alt="ar-vr icon" />
+                    </div>
+                    <div class="icon-block">
+                      <img src="./assets/img/logos/sql.png" alt="artificial intelligence icon" />
+                    </div>
+                  </div>
+                  <div class="center-logo">
+                    <img src="./assets/img/logos/vscode.png" style="border-radius:10px" alt="logo" />
+                  </div>
+                </div>
+              </section>
 
 
         <div class="container px-4 py-5">
+
+
+
+
             <div class="row flex-lg-row-reverse align-items-center justify-content-center g-2 py-5">
                 <div id="carouselExampleIndicators" class="carousel slide col-10 col-sm-8 col-lg-6" data-bs-ride="carousel">
                     <div class="carousel-indicators">
@@ -158,7 +225,7 @@
             background-size: cover;
             background-blend-mode: overlay;
             opacity: 0.5;
-            z-index: -1;
+            z-index: -2;
         }
       </style>
 
