@@ -21,7 +21,50 @@ $profileImage = htmlspecialchars($details->Avatar, ENT_QUOTES, 'UTF-8'); // Sani
 $name = htmlspecialchars($details->First_Name, ENT_QUOTES, 'UTF-8'); // Sanitize output
 $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize output
 
+
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+    // Assume user is logged in and their ID is stored in session
+    $organizerId = $id; // or however you track logged-in users
+
+    // Generate unique event ID
+    $eventId = uniqid("event_", true); // e.g., event_6613e9d2e52417.80932401
+
+    // Handle file upload
+    $posterTmp = $_FILES['event-poster']['tmp_name'];
+    $fileExt = pathinfo($_FILES['event-poster']['name'], PATHINFO_EXTENSION);
+    $posterNewName = $eventId . "." . $fileExt;
+    $posterPath = "uploads/" . $posterNewName;
+
+    // Move and optionally resize
+    if (move_uploaded_file($posterTmp, $posterPath)) {
+        // Optional: Resize image to 2687x1535 (add the GD code here if needed)
+
+        // Get the rest of the inputs
+        $title = $conn->real_escape_string($_POST['event-title']);
+        $location = $conn->real_escape_string($_POST['event-location']);
+        $description = $conn->real_escape_string($_POST['event-description']);
+        $cost = floatval($_POST['event-cost']);
+        $mode = $conn->real_escape_string($_POST['event-mode']);
+
+        // Insert into DB
+        $sql = "INSERT INTO events (event_id, organizer_id, poster, title, location, description, cost, mode) 
+                VALUES ('$eventId', $organizerId, '$posterPath', '$title', '$location', '$description', $cost, '$mode')";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "Event submitted successfully!";
+        } else {
+            echo "Database Error: " . $conn->error;
+        }
+    } else {
+        echo "Failed to upload poster.";
+    }
+}
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -123,31 +166,35 @@ $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize out
             width: 100%;
             border-radius: 3px;
         }
+
+
+    .drop-zone {
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+    }
+    .drop-zone.dragover {
+        background-color: #e3f2fd;
+    }
+    .drop-zone img {
+        max-width: 100%;
+        margin-top: 10px;
+        max-height: 200px;
+    }
+
+
+
+
     </style>
 
 
 
 
 <!-- Button to Trigger Popover -->
-<div class="popover-container">
-        <button class="add-product-btn" onclick="togglePopover()">➕ Add Product</button>
-        
-        <!-- Popover Form -->
-        <div class="popover" id="popoverForm">
-            <form id="addProductForm">
-                <label>Product Name:</label>
-                <input type="text" id="product_name" required>
 
-                <label>Price ($):</label>
-                <input type="number" id="price" step="0.01" required>
-
-                <label>Category:</label>
-                <input type="text" id="category" required>
-
-                <button type="button" onclick="saveProduct()">Save Product</button>
-            </form>
-        </div>
-    </div>
 <!-- add product popover  -->
     <div class="page-wrapper">
         <!-- HEADER MOBILE-->
@@ -477,10 +524,16 @@ $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize out
                                 <h3 class="text-center title-2">Create Event</h3>
                             </div>
                             <hr>
-                            <form action="" method="post" enctype="multipart/form-data" novalidate="novalidate">
-                                <div class="form-group">
+                            <form action="add_event.php" method="post" enctype="multipart/form-data" novalidate="novalidate">
+                            <div class="form-group">
                                     <label for="event-poster" class="control-label mb-1">Event Poster</label>
-                                    <input id="event-poster" name="event-poster" type="file" class="form-control-file" required>
+                                    <div class="drop-zone" id="drop-zone">
+                                        <p>Drag & drop poster here or click to upload</p>
+                                        <input type="file" name="event-poster" id="event-poster" class="form-control-file" accept="image/*" hidden required>
+                                        <img id="preview" src="#" alt="Preview" style="display: none;" />
+                                    </div>
+                                    <small class="form-text text-muted">Recommended size: 2687px × 1535px</small>
+
                                 </div>
                                 <div class="form-group">
                                     <label for="event-title" class="control-label mb-1">Event Title</label>
@@ -549,6 +602,87 @@ $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize out
     <script src="vendor/chartjs/Chart.bundle.min.js"></script>
     <script src="vendor/select2/select2.min.js">
     </script>
+
+
+<script>
+    const dropZone = document.getElementById("drop-zone");
+    const fileInput = document.getElementById("event-poster");
+    const preview = document.getElementById("preview");
+
+    // Open file picker on click
+    dropZone.addEventListener("click", () => fileInput.click());
+
+    // Handle file input change
+    fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Drag-over effect
+    dropZone.addEventListener("dragover", e => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+    });
+
+    // Drop event
+    dropZone.addEventListener("drop", e => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith("image/")) {
+            fileInput.files = e.dataTransfer.files;
+            const reader = new FileReader();
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        } else {
+            alert("Please upload an image file.");
+        }
+    });
+
+
+    fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (file && file.type.startsWith("image/")) {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+
+        img.onload = function () {
+            if (img.width === 2687 && img.height === 1535) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert("Image must be 2687x1535 pixels!");
+                fileInput.value = ""; // Reset file input
+                preview.style.display = "none";
+            }
+            URL.revokeObjectURL(objectUrl);
+        };
+
+        img.src = objectUrl;
+    }
+});
+
+</script>
+
 
 <script>
     function togglePopover() {

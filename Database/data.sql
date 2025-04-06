@@ -24,3 +24,27 @@ CREATE TABLE user_tokens (
 );
 
 
+
+CREATE TABLE events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id VARCHAR(100) UNIQUE NOT NULL,
+    organizer_id INT NOT NULL,
+    poster VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    cost DECIMAL(10,2),
+    mode ENUM('physical', 'online'),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (organizer_id) REFERENCES users(SN)
+);
+
+
+
+
+
+
+
+
+
+
