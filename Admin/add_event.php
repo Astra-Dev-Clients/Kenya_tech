@@ -27,10 +27,10 @@ $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize out
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Assume user is logged in and their ID is stored in session
-    $organizerId = $id; // or however you track logged-in users
+    $organizerId = $id; // e.g., from session
 
     // Generate unique event ID
-    $eventId = uniqid("event_", true); // e.g., event_6613e9d2e52417.80932401
+    $eventId = uniqid("event_", true);
 
     // Handle file upload
     $posterTmp = $_FILES['event-poster']['tmp_name'];
@@ -38,25 +38,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $posterNewName = $eventId . "." . $fileExt;
     $posterPath = "uploads/" . $posterNewName;
 
-    // Move and optionally resize
     if (move_uploaded_file($posterTmp, $posterPath)) {
-        // Optional: Resize image to 2687x1535 (add the GD code here if needed)
-
-        // Get the rest of the inputs
-        $title = $conn->real_escape_string($_POST['event-title']);
-        $location = $conn->real_escape_string($_POST['event-location']);
-        $description = $conn->real_escape_string($_POST['event-description']);
+        // Collect and sanitize form inputs
+        $title = $_POST['event-title'];
+        $location = $_POST['event-location'];
+        $description = $_POST['event-description'];
         $cost = floatval($_POST['event-cost']);
-        $mode = $conn->real_escape_string($_POST['event-mode']);
+        $mode = $_POST['event-mode'];
 
-        // Insert into DB
-        $sql = "INSERT INTO events (event_id, organizer_id, poster, title, location, description, cost, mode) 
-                VALUES ('$eventId', $organizerId, '$posterPath', '$title', '$location', '$description', $cost, '$mode')";
+        // Prepare insert statement
+        $stmt = $conn->prepare("INSERT INTO events (event_id, organizer_id, poster, title, location, description, cost, mode) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        if ($stmt) {
+            $stmt->bind_param("sissssds", $eventId, $organizerId, $posterPath, $title, $location, $description, $cost, $mode);
 
-        if ($conn->query($sql) === TRUE) {
-            echo "Event submitted successfully!";
+            if ($stmt->execute()) {
+                echo "Event submitted successfully!";
+            } else {
+                echo "Execute error: " . $stmt->error;
+            }
+
+            $stmt->close();
         } else {
-            echo "Database Error: " . $conn->error;
+            echo "Prepare error: " . $conn->error;
         }
     } else {
         echo "Failed to upload poster.";
@@ -517,6 +521,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="section__content section__content--p30">
             <div class="container-fluid d-block align-items-center justify-content-center">
                 <div class="col-lg-8">
+
+                <div id="alert-container"></div>
+
+
                     <div class="card">
                         <div class="card-header">Event Details</div>
                         <div class="card-body">
@@ -684,33 +692,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </script>
 
 
-<script>
-    function togglePopover() {
-        let popover = document.getElementById("popoverForm");
-        popover.classList.toggle("show");
 
-        // Hide popover when clicking outside
-        document.addEventListener("click", function(event) {
-            if (!event.target.closest(".popover-container")) {
-                popover.classList.remove("show");
-            }
-        }, { once: true });
-    }
 
-    function saveProduct() {
-        let name = document.getElementById("product_name").value;
-        let price = document.getElementById("price").value;
-        let category = document.getElementById("category").value;
 
-        if (name && price && category) {
-            alert(`✅ Product Added!\nName: ${name}\nPrice: $${price}\nCategory: ${category}`);
-            document.getElementById("addProductForm").reset(); // Clear form after saving
-            document.getElementById("popoverForm").classList.remove("show"); // Hide popover
-        } else {
-            alert("⚠️ Please fill all fields!");
-        }
-    }
-</script>
+
+
 
 
     <!-- Main JS-->
