@@ -38,6 +38,7 @@ $url = $client->createAuthUrl();
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="Assets/CSS/styles.css">
+    <link rel="stylesheet" href="Assets/CSS/ribbon.css">
     <!-- Boostrap CSS -->
     <!-- Stylesheet -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -114,7 +115,7 @@ $url = $client->createAuthUrl();
       <div class="overlay"></div>
 
             <!-- overlay -->
-            <section class="main-container">
+        <!-- <section class="main-container">
                 <div class="main">
                   <div class="big-circle">
                     <div class="icon-block">
@@ -148,7 +149,7 @@ $url = $client->createAuthUrl();
                     <img src="./assets/img/logos/vscode.png" style="border-radius:10px" alt="logo" />
                   </div>
                 </div>
-              </section>
+        </section> -->
 
 
         <div class="container px-4 py-5">
@@ -187,7 +188,7 @@ $url = $client->createAuthUrl();
                     <h1 class="display-5 fw-bold text-body-emphasis lh-2 mb-3">Empowering Tech Innovation in Kenya</h1>
                     <p class="lead">Bringing together tech enthusiasts, startups, and industry leaders to collaborate, learn, and drive the future of technology. </p>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                        <a type="button" class="btn text-white btn-lg px-4 me-md-2" style="background-color: #061a60;" href="#events">Explore Events</a>
+                        <a type="button" class="btn text-white btn-lg px-4 me-md-2" style="background-color: #061a60;" href="#events">Explore Events<span class="blink"></span></a>
                         <button type="button" class="btn btn-outline-secondary btn-lg px-4">Learn More</button>
                     </div>
                 </div>
@@ -227,6 +228,25 @@ $url = $client->createAuthUrl();
             opacity: 0.5;
             z-index: -2;
         }
+
+                .blink {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        margin-left: 8px;
+        background-color: red;
+        border-radius: 50%;
+        animation: blinker 1s infinite;
+        }
+
+        @keyframes blinker {
+        50% {
+            opacity: 0;
+        }
+        }
+
+
+        
       </style>
 
 
@@ -301,6 +321,7 @@ $url = $client->createAuthUrl();
     <div class="row">
         <div class="col-md-4">
             <div class="card">
+            <div class="ribbon">Live Now</div>
                 <img src="./Assets/Img/posts/5929627.jpg" class="card-img-top" alt="Event 1">
                 <div class="card-body">
                     <h5 class="card-title">Nairobi Tech Summit 2025</h5>

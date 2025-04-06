@@ -60,7 +60,7 @@ try {
             if (mysqli_num_rows($check_query) > 0) {
                 $id = $row['SN'];
                 $_SESSION['google_auth'] = $id;
-                header("Location: ../portal/home.php");
+                header("Location: ../admin/index.php");
             } else {
                 // Insert user into database
                 $insert = "INSERT INTO users (First_Name, Last_Name, Email, Avatar, Pass, Reg_Date) VALUES ('$givenName', '$familyName', '$email', '$picture', 'portfolio1234', NOW())";
@@ -69,7 +69,7 @@ try {
                 if ($insert_query) {
                     $id = mysqli_insert_id($conn);
                     $_SESSION['google_auth'] = $id;
-                    header("Location: ../portal/home.php");
+                    header("Location: ../admin/index.php");
                 } else {
                     exit("Database insertion failed");
                 }
