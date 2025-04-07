@@ -37,6 +37,10 @@ if ($result->num_rows > 0) {
 }
 
 
+// get events for specific user
+
+
+
 
 ?>
 
@@ -632,107 +636,61 @@ if ($result->num_rows > 0) {
                             </div>
                         </div>
 
-<!-- 
-                        // CREATE TABLE events (
-                        //     id INT AUTO_INCREMENT PRIMARY KEY,
-                        //     event_id VARCHAR(100) UNIQUE NOT NULL,
-                        //     organizer_id INT NOT NULL,
-                        //     poster VARCHAR(255) NOT NULL,
-                        //     title VARCHAR(255) NOT NULL,
-                        //     location VARCHAR(255) NOT NULL,
-                        //     description TEXT NOT NULL,
-                        //     cost DECIMAL(10,2),
-                        //     mode ENUM('physical', 'online'),
-                        //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        //     FOREIGN KEY (organizer_id) REFERENCES users(SN)
-                        // ); -->
 
                         <div class="row">
                             <div class="col-lg-9">
                                 <h2 class="title-1 m-b-25">Earnings By Items</h2>
                                 <div class="table-responsive table--no-card m-b-40">
-                                    <table class="table table-borderless table-striped table-earning">
-                                        <thead>
-                                            <tr>
-                                                <th>SN</th>
-                                                <th>date</th>
-                                                <th>Event ID</th>
-                                                <th>Event Name</th>
-                                                <th class="text-right">Ticket Price</th>
-                                                <th>Mode</th>
-                                                <th>Location</th>
-                                                <th class="text-right">Tickets Sold</th>
-                                                <th class="text-right">Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
+                                <table class="table table-borderless table-striped table-earning">
+                                    <thead>
+                                        <tr>
+                                            <th>SN</th>
+                                            <th>Date</th>
+                                            <th>Event ID</th>
+                                            <th>Event Name</th>
+                                            <th class="text-right">Ticket Price</th>
+                                            <th>Mode</th>
+                                            <th>Location</th>
+                                            <th class="text-right">Tickets Sold</th>
+                                            <th class="text-right">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                <?php
 
-                                            <tr>
-                                                <td>2018-09-29 05:57</td>
-                                                <td>100398</td>
-                                                <td>iPhone X 64Gb Grey</td>
-                                                <td class="text-right">$999.00</td>
-                                                <td class="text-right">1</td>
-                                                <td class="text-right">$999.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2018-09-28 01:22</td>
-                                                <td>100397</td>
-                                                <td>Samsung S8 Black</td>
-                                                <td class="text-right">$756.00</td>
-                                                <td class="text-right">1</td>
-                                                <td class="text-right">$756.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2018-09-27 02:12</td>
-                                                <td>100396</td>
-                                                <td>Game Console Controller</td>
-                                                <td class="text-right">$22.00</td>
-                                                <td class="text-right">2</td>
-                                                <td class="text-right">$44.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2018-09-26 23:06</td>
-                                                <td>100395</td>
-                                                <td>iPhone X 256Gb Black</td>
-                                                <td class="text-right">$1199.00</td>
-                                                <td class="text-right">1</td>
-                                                <td class="text-right">$1199.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2018-09-25 19:03</td>
-                                                <td>100393</td>
-                                                <td>USB 3.0 Cable</td>
-                                                <td class="text-right">$10.00</td>
-                                                <td class="text-right">3</td>
-                                                <td class="text-right">$30.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2018-09-29 05:57</td>
-                                                <td>100392</td>
-                                                <td>Smartwatch 4.0 LTE Wifi</td>
-                                                <td class="text-right">$199.00</td>
-                                                <td class="text-right">6</td>
-                                                <td class="text-right">$1494.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2018-09-24 19:10</td>
-                                                <td>100391</td>
-                                                <td>Camera C430W 4k</td>
-                                                <td class="text-right">$699.00</td>
-                                                <td class="text-right">1</td>
-                                                <td class="text-right">$699.00</td>
-                                            </tr>
-                                            <tr>
-                                                <td>2018-09-22 00:43</td>
-                                                <td>100393</td>
-                                                <td>USB 3.0 Cable</td>
-                                                <td class="text-right">$10.00</td>
-                                                <td class="text-right">3</td>
-                                                <td class="text-right">$30.00</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                        $sql = "SELECT * FROM events WHERE organizer_id = ? ORDER BY Event_Date DESC";
+                                        $stmt = $conn->prepare($sql);
+                                        $stmt->bind_param("i", $id);
+                                        $stmt->execute();
+                                        
+                                        $result = $stmt->get_result();
+                                        $sn = 1;
+
+                                        if ($result->num_rows > 0) {
+                                            while ($row = $result->fetch_assoc()) {
+                                                $total = 0.00; // since tickets sold = 0
+                                                echo "<tr>
+                                                        <td>{$sn}</td>
+                                                        <td>{$row['Event_Date']}</td>
+                                                        <td>{$row['event_id']}</td>
+                                                        <td>{$row['title']}</td>
+                                                        <td class='text-right'>$" . number_format($row['cost'], 2) . "</td>
+                                                        <td>{$row['mode']}</td>
+                                                        <td>{$row['location']}</td>
+                                                        <td class='text-right'>0</td>
+                                                        <td class='text-right'>$" . number_format($total, 2) . "</td>
+                                                    </tr>";
+                                                $sn++;
+                                            }
+                                        } else {
+                                            echo "<tr><td colspan='9'>No events found</td></tr>";
+                                        }
+
+                                        $conn->close();
+                                        ?>
+                                    </tbody>
+                                </table>
+
                                 </div>
                             </div>
                             <div class="col-lg-3">
