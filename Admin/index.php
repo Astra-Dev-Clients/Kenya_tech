@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['google_auth']) && !isset($_SESSION['email_auth'])) {
-   header('location: ../auth/index.php');
+   header('location: ../index.php');
    exit();
 }
 
@@ -507,7 +507,7 @@ if ($result->num_rows > 0) {
                                                 <i class="zmdi zmdi-account-o"></i>
                                             </div>
                                             <div class="text">
-                                                <h2>10368</h2>
+                                                <h2>103</h2>
                                                 <span>active attendees</span>
                                             </div>
                                         </div>
@@ -525,7 +525,7 @@ if ($result->num_rows > 0) {
                                                 <i class="zmdi zmdi-shopping-cart"></i>
                                             </div>
                                             <div class="text">
-                                                <h2>388,688</h2>
+                                                <h2>103</h2>
                                                 <span>tickets sold</span>
                                             </div>
                                         </div>

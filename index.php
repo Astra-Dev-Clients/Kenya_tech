@@ -20,6 +20,7 @@ $client->addScope("profile");
 $url = $client->createAuthUrl();
 
 
+
 ?>
 
 <!DOCTYPE html>
@@ -285,6 +286,10 @@ $url = $client->createAuthUrl();
         <div class="col-md-4">
             <input type="text" class="form-control" placeholder="Search events...">
         </div>
+
+
+
+
         <div class="col-md-2">
             <select class="form-select">
                 <option selected>Category</option>
@@ -295,6 +300,9 @@ $url = $client->createAuthUrl();
                 <option>Startups</option>
             </select>
         </div>
+
+
+
         <div class="col-md-2">
             <input type="date" class="form-control">
         </div>
@@ -319,41 +327,65 @@ $url = $client->createAuthUrl();
 
     <!-- Events Cards -->
     <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-            <div class="ribbon">Live Now</div>
-                <img src="./Assets/Img/posts/5929627.jpg" class="card-img-top" alt="Event 1">
-                <div class="card-body">
-                    <h5 class="card-title">Nairobi Tech Summit 2025</h5>
-                    <p class="card-text"><i class="bi bi-calendar"></i> April 15, 2025 | Nairobi</p>
-                    <p class="text-muted">A must-attend event for tech innovators, startups, and developers.</p>
-                    <a href="#" class="btn" style="background-color: #061a60; color: #fff;">Register Now</a>
-                </div>
-            </div>
-        </div>
+    
+            <!-- CREATE TABLE events (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                Event_Date DATETIME NOT NULL,
+                event_id VARCHAR(100) UNIQUE NOT NULL,
+                organizer_id INT NOT NULL,
+                poster VARCHAR(255) NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                location VARCHAR(255) NOT NULL,
+                description TEXT NOT NULL,
+                cost DECIMAL(10,2),
+                mode ENUM('physical', 'online'),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (organizer_id) REFERENCES users(SN)
+            ); -->
 
-        <div class="col-md-4">
-            <div class="card">
-                <img src="./Assets/Img/posts/event-2.jpg" class="card-img-top" alt="Event 2">
-                <div class="card-body">
-                    <h5 class="card-title">AI & Data Science Conference</h5>
-                    <p class="card-text"><i class="bi bi-calendar"></i> May 10, 2025 | Mombasa</p>
-                    <p class="text-muted">Explore the latest trends in AI, ML, and Data Science.</p>
-                    <a href="#" class="btn" style="background-color: #061a60; color: #fff;">Register Now</a>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card">
-                <img src="./Assets/Img/posts/event-3.jpg" class="card-img-top" alt="Event 3">
-                <div class="card-body">
-                    <h5 class="card-title">Startup Founders Meetup</h5>
-                    <p class="card-text"><i class="bi bi-calendar"></i> June 5, 2025 | Kisumu</p>
-                    <p class="text-muted">Meet and network with investors and fellow startup founders.</p>
-                    <a href="#" class="btn" style="background-color: #061a60; color: #fff;">Register Now</a>
-                </div>
-            </div>
+            <!-- map events -->
+             <?php
+
+                $sql = "SELECT * FROM events ORDER BY Event_Date DESC LIMIT 3";
+                $result = $conn->query($sql);
+
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                    
+                        $poster = $row['poster'];
+                        $title = $row['title'];
+                        $location = $row['location'];
+                        $description = $row['description'];
+                        $event_date = date('F j, Y', strtotime($row['Event_Date']));
+                        $event_id = $row['event_id'];
+                        $cost = $row['cost'];
+                        $mode = $row['mode'];
+                        $organizer_id = $row['organizer_id'];
+                        $created_at = $row['created_at'];
+                        $event_date = date('F j, Y', strtotime($row['Event_Date']));
+                        $event_id = $row['event_id'];
+
+
+                        echo '<div class="col-md-4">';
+                        echo '<div class="card">';
+                        echo '<img src="Admin/'.$poster.'" class="card-img-top" alt="Event Image">';
+                        echo '<div class="card-body">';
+                        echo '<h5 class="card-title">' . $row['title'] . '</h5>';
+                        echo '<p class="card-text"><i class="bi bi-calendar"></i> ' . date('F j, Y', strtotime($row['Event_Date'])) . ' | ' . $row['location'] . '</p>';
+                        echo '<p class="text-muted">' . $row['description'] . '</p>';
+                        echo '<a href="#" class="btn" style="background-color: #061a60; color: #fff;">Register Now</a>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                } else {
+                    echo "No events found.";
+                }
+                $conn->close();
+
+             ?>
+
         </div>
     </div>
 </section>
