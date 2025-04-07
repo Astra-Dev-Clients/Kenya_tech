@@ -40,20 +40,59 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (move_uploaded_file($posterTmp, $posterPath)) {
         // Collect and sanitize form inputs
+        $Event_Date = $_POST['Event-date'];
         $title = $_POST['event-title'];
         $location = $_POST['event-location'];
         $description = $_POST['event-description'];
         $cost = floatval($_POST['event-cost']);
         $mode = $_POST['event-mode'];
 
+
         // Prepare insert statement
-        $stmt = $conn->prepare("INSERT INTO events (event_id, organizer_id, poster, title, location, description, cost, mode) 
-                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO events ( Event_Date,event_id, organizer_id, poster, title, location, description, cost, mode) 
+                                VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)");
         if ($stmt) {
-            $stmt->bind_param("sissssds", $eventId, $organizerId, $posterPath, $title, $location, $description, $cost, $mode);
+            $stmt->bind_param("ssissssds", $Event_Date, $eventId, $organizerId, $posterPath, $title, $location, $description, $cost, $mode);
 
             if ($stmt->execute()) {
-                echo "Event submitted successfully!";
+                       // Success message
+        echo '
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Success</title>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <style>
+                body {
+                    height: 100vh;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background-color: #f8f9fa;
+                }
+                .alert-container {
+                    max-width: 500px;
+                    width: 100%;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="alert-container">
+                <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                    <h2 class="mb-2">✅ <strong>Success!</strong></h2>
+                    Event created successfully.
+                    <br>
+                    <button type="button" class="btn btn-success mt-3" onclick="window.location.href=\'./home.php\'">Go to Dashboard</button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </body>
+        </html>
+        ';
+        // exit();
             } else {
                 echo "Execute error: " . $stmt->error;
             }
@@ -547,6 +586,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <label for="event-title" class="control-label mb-1">Event Title</label>
                                     <input id="event-title" name="event-title" type="text" class="form-control" required placeholder="Enter event title">
                                 </div>
+
+                                <!-- event date -->
+                                <div class="form-group">
+                                    <label for="event-date" class="control-label mb-1">Event Date</label>
+                                    <input id="Event-date" name="Event-date" type="datetime-local" class="form-control" required placeholder="Enter event Date">
+                                </div>
+
+
                                 <div class="form-group">
                                     <label for="event-location" class="control-label mb-1">Location</label>
                                     <input id="event-location" name="event-location" type="text" class="form-control" required placeholder="Event location">

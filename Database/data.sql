@@ -25,8 +25,10 @@ CREATE TABLE user_tokens (
 
 
 
+
 CREATE TABLE events (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    Event_Date DATETIME NOT NULL,
     event_id VARCHAR(100) UNIQUE NOT NULL,
     organizer_id INT NOT NULL,
     poster VARCHAR(255) NOT NULL,

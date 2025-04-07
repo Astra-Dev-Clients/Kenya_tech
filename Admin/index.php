@@ -21,6 +21,23 @@ $profileImage = htmlspecialchars($details->Avatar, ENT_QUOTES, 'UTF-8'); // Sani
 $name = htmlspecialchars($details->First_Name, ENT_QUOTES, 'UTF-8'); // Sanitize output
 $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize output
 
+
+
+// Fetch events no of events for specific user
+$stmt = $conn->prepare("SELECT COUNT(*) as total_events FROM events WHERE organizer_id = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$total_events = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $total_events = $row['total_events'];
+} else {
+    echo "No events found.";
+}
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -130,7 +147,6 @@ $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize out
 
 <!-- Button to Trigger Popover -->
 <div class="popover-container">
-        <button class="add-product-btn" onclick="togglePopover()">➕ Add Product</button>
         
         <!-- Popover Form -->
         <div class="popover" id="popoverForm">
@@ -523,7 +539,7 @@ $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize out
                                                 <i class="zmdi zmdi-calendar-note"></i>
                                             </div>
                                             <div class="text">
-                                                <h2>1,086</h2>
+                                                <h2><?=$total_events?></h2>
                                                 <span>events this year</span>
                                             </div>
                                         </div>
@@ -616,6 +632,21 @@ $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize out
                             </div>
                         </div>
 
+<!-- 
+                        // CREATE TABLE events (
+                        //     id INT AUTO_INCREMENT PRIMARY KEY,
+                        //     event_id VARCHAR(100) UNIQUE NOT NULL,
+                        //     organizer_id INT NOT NULL,
+                        //     poster VARCHAR(255) NOT NULL,
+                        //     title VARCHAR(255) NOT NULL,
+                        //     location VARCHAR(255) NOT NULL,
+                        //     description TEXT NOT NULL,
+                        //     cost DECIMAL(10,2),
+                        //     mode ENUM('physical', 'online'),
+                        //     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        //     FOREIGN KEY (organizer_id) REFERENCES users(SN)
+                        // ); -->
+
                         <div class="row">
                             <div class="col-lg-9">
                                 <h2 class="title-1 m-b-25">Earnings By Items</h2>
@@ -623,15 +654,19 @@ $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize out
                                     <table class="table table-borderless table-striped table-earning">
                                         <thead>
                                             <tr>
+                                                <th>SN</th>
                                                 <th>date</th>
                                                 <th>Event ID</th>
                                                 <th>Event Name</th>
                                                 <th class="text-right">Ticket Price</th>
+                                                <th>Mode</th>
+                                                <th>Location</th>
                                                 <th class="text-right">Tickets Sold</th>
                                                 <th class="text-right">Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
+
                                             <tr>
                                                 <td>2018-09-29 05:57</td>
                                                 <td>100398</td>
