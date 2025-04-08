@@ -56,7 +56,9 @@ $url = $client->createAuthUrl();
 
 
     <link rel="stylesheet" href="./Assets/CSS/rotate.css">
-
+  
+    <!-- boostrap icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
 
      <!-- include font-awesome -->
@@ -327,27 +329,11 @@ $url = $client->createAuthUrl();
 
     <!-- Events Cards -->
     <div class="row">
-    
-            <!-- CREATE TABLE events (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                Event_Date DATETIME NOT NULL,
-                event_id VARCHAR(100) UNIQUE NOT NULL,
-                organizer_id INT NOT NULL,
-                poster VARCHAR(255) NOT NULL,
-                title VARCHAR(255) NOT NULL,
-                location VARCHAR(255) NOT NULL,
-                description TEXT NOT NULL,
-                cost DECIMAL(10,2),
-                mode ENUM('physical', 'online'),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (organizer_id) REFERENCES users(SN)
-            ); -->
 
 
-            <!-- map events -->
              <?php
 
-                $sql = "SELECT * FROM events ORDER BY Event_Date DESC LIMIT 3";
+                $sql = "SELECT * FROM events ORDER BY Event_Date ASC LIMIT 10";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -372,9 +358,9 @@ $url = $client->createAuthUrl();
                         echo '<img src="Admin/'.$poster.'" class="card-img-top" alt="Event Image">';
                         echo '<div class="card-body">';
                         echo '<h5 class="card-title">' . $row['title'] . '</h5>';
-                        echo '<p class="card-text"><i class="bi bi-calendar"></i> ' . date('F j, Y', strtotime($row['Event_Date'])) . ' | ' . $row['location'] . '</p>';
-                        echo '<p class="text-muted">' . $row['description'] . '</p>';
-                        echo '<a href="#" class="btn" style="background-color: #061a60; color: #fff;">Register Now</a>';
+                        echo '<p class="card-text text-capitalize"><i class="bi bi-calendar"></i> ' . date('F j, Y', strtotime($row['Event_Date'])) . ' | ' .$location. ' | '.$mode.'</p>';
+                        echo '<p class="text-muted text-capitalize">' . $row['description'] . '</p>';
+                        echo '<a href="event_details.php?id='.$event_id.'" class="btn" style="background-color: #061a60; color: #fff;">Register Now</a>';
                         echo '</div>';
                         echo '</div>';
                         echo '</div>';
