@@ -24,8 +24,6 @@ CREATE TABLE user_tokens (
 );
 
 
-
-
 CREATE TABLE events (
     id INT AUTO_INCREMENT PRIMARY KEY,
     Event_Date DATETIME NOT NULL,
@@ -36,10 +34,14 @@ CREATE TABLE events (
     location VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
     cost DECIMAL(10,2),
+    General Admission DECIMAL (10,2),
     mode ENUM('physical', 'online'),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (organizer_id) REFERENCES users(SN)
 );
+
+
+
 
 
 

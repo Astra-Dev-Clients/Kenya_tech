@@ -150,72 +150,115 @@ if ($event) {
  
 
 <!-- Event Purchase Section -->
-<section class="container my-4">
+<section class="container my-5">
 
-     <!-- event poster -->
-   
-     <div class="container">
-      
-    <div class="row justify-content-center mb-4">
-        <div class="col-md-6">
-        <img src="admin/<?=$event_poster?>" alt="Event Poster" class="img-fluid rounded shadow-sm">
-        </div>
-    </div>
-    </div>
-    </div>
-
-  <div class="text-center mb-4">
-    <h1 class="display-4">About </h1>
-    <h2><?= $event_title?></h2>
-    <p><?=$event_description?></p>
-
-    <div class="container text-start mb-4">
-        <p class="h4 my-3">Event Details</p>
-            <p><strong>Date:</strong> <?= $event_date?></p>
-            <p><strong>Location:</strong> <?= $event_location?></p>
-            <p><strong>Mode:</strong> <?= $event_mode?></p>
-            <p><strong>Created At:</strong> <?= $created_at?></p>
-            <p><strong>Cost:</strong> <?= $event_cost?></p>
-            <p><strong>Tickets Available:</strong> 100</p>
-    </div>
+  <!-- Hero Section -->
+  <div class="text-center  mb-5 d-flex flex-column align-items-center justify-content-center">
+    <img src="admin/<?=$event_poster?>" alt="Event Poster" class="img-fluid rounded-4 shadow mb-4" style="max-height: 400px; object-fit: cover;">
+    <h1 class="display-5 fw-bold text-primary"><?= $event_title ?></h1>
+    <p class="lead text-muted"><?= $event_description ?></p>
   </div>
-  <!-- Ticket Categories -->
-  <div class="row g-4">
-    <div class="col-md-4">
 
-
-      <div class="card border-primary h-100">
-        <div class="card-body text-center">
-          <h5 class="card-title">General Admission</h5>
-          <p class="card-text">Access to all main areas. Perfect for individuals.</p>
-          <h6 class="mb-3">$25</h6>
-          <a href="#" class="btn btn-primary">Buy Now</a>
-        </div>
-      </div>
-    </div>
-
-
-    <div class="col-md-4">
-      <div class="card border-success h-100">
-        <div class="card-body text-center">
-          <h5 class="card-title">VIP Pass</h5>
-          <p class="card-text">Exclusive seating, meals & backstage access.</p>
-          <h6 class="mb-3">$75</h6>
-          <a href="#" class="btn btn-success">Buy Now</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-warning h-100">
-        <div class="card-body text-center">
-          <h5 class="card-title">Group Package</h5>
-          <p class="card-text">Best for teams and families. Up to 5 people.</p>
-          <h6 class="mb-3">$100</h6>
-          <a href="#" class="btn btn-warning">Buy Now</a>
+  <!-- Event Info -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-md-10 col-lg-8">
+      <div class="bg-light rounded-4 shadow-sm p-4">
+        <div class="row">
+          <div class="col-sm-6 mb-3">
+            <p class="mb-1 text-muted">Date</p>
+            <h5><?= $event_date ?></h5>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <p class="mb-1 text-muted">Location</p>
+            <h5><?= $event_location ?></h5>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <p class="mb-1 text-muted">Mode</p>
+            <h5><?= $event_mode ?></h5>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <p class="mb-1 text-muted">Created At</p>
+            <h5><?= $created_at ?></h5>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <p class="mb-1 text-muted">Cost</p>
+            <h5><?= $event_cost ?></h5>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <p class="mb-1 text-muted">Tickets Available</p>
+            <h5><span class="badge bg-success fs-6">100</span></h5>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Ticket Options -->
+  <h3 class="text-center fw-bold mb-4 text-secondary">Ticket Categories</h3>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+
+    <!-- General Admission -->
+    <div class="col">
+      <div class="card h-100 shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3 text-center">
+          <h5 class="fw-semibold text-primary">General Admission</h5>
+        </div>
+        <div class="card-body text-center">
+          <h2 class="text-primary mb-3">Ksh 2000 <small class="text-muted fs-6">/mo</small></h2>
+          <ul class="list-unstyled mb-4">
+            <li>10 users included</li>
+            <li>2 GB storage</li>
+            <li>Email support</li>
+            <li>Help center access</li>
+          </ul>
+          <button class="btn btn-outline-primary w-100">Buy Ticket</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIP -->
+    <div class="col">
+      <div class="card h-100 shadow-sm border-warning rounded-4">
+        <div class="card-header bg-warning text-white py-3 text-center">
+          <h5 class="fw-semibold">VIP</h5>
+        </div>
+        <div class="card-body text-center">
+          <h2 class="text-warning mb-3">Ksh 4000 <small class="text-muted fs-6">/mo</small></h2>
+          <ul class="list-unstyled mb-4">
+            <li>20 users included</li>
+            <li>10 GB storage</li>
+            <li>Priority support</li>
+            <li>Help center access</li>
+          </ul>
+          <button class="btn btn-outline-warning  w-100">Buy Ticket</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="col">
+      <div class="card h-100 shadow-sm border-primary rounded-4">
+        <div class="card-header bg-primary text-white py-3 text-center">
+          <h5 class="fw-semibold">Enterprise</h5>
+        </div>
+        <div class="card-body text-center">
+          <h2 class="text-primary mb-3">Ksh 3000 <small class="text-warning fs-6">/mo</small></h2>
+          <ul class="list-unstyled mb-4 text-dark">
+            <li>30 users included</li>
+            <li>15 GB storage</li>
+            <li>Phone & email support</li>
+            <li>Help center access</li>
+          </ul>
+          <button class="btn btn-outline-primary  w-100">Buy Ticket</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+
 
   <!-- Share Buttons -->
   <div class="text-center my-4">
