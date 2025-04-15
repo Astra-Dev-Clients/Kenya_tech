@@ -338,36 +338,33 @@ $url = $client->createAuthUrl();
 
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                    
+                        // Extract data from the row
                         $poster = $row['poster'];
                         $title = $row['title'];
                         $location = $row['location'];
                         $description = $row['description'];
                         $event_date = date('F j, Y', strtotime($row['Event_Date']));
                         $event_id = $row['event_id'];
-                        $cost = $row['cost'];
                         $mode = $row['mode'];
                         $organizer_id = $row['organizer_id'];
                         $created_at = $row['created_at'];
-                        $event_date = date('F j, Y', strtotime($row['Event_Date']));
-                        $event_id = $row['event_id'];
-
-
+                
                         echo '<div class="col-md-4">';
-                        echo '<div class="card">';
-                        echo '<img src="Admin/'.$poster.'" class="card-img-top" alt="Event Image">';
-                        echo '<div class="card-body">';
-                        echo '<h5 class="card-title">' . $row['title'] . '</h5>';
-                        echo '<p class="card-text text-capitalize"><i class="bi bi-calendar"></i> ' . date('F j, Y', strtotime($row['Event_Date'])) . ' | ' .$location. ' | '.$mode.'</p>';
-                        echo '<p class="text-muted text-capitalize">' . $row['description'] . '</p>';
-                        echo '<a href="event_details.php?id='.$event_id.'" class="btn" style="background-color: #061a60; color: #fff;">Register Now</a>';
-                        echo '</div>';
-                        echo '</div>';
+                        echo '  <div class="card">';
+                        echo '      <img src="assets/img/events/' . htmlspecialchars($poster) . '" class="card-img-top" alt="Event Image">';
+                        echo '      <div class="card-body">';
+                        echo '          <h5 class="card-title">' . htmlspecialchars($title) . '</h5>';
+                        echo '          <p class="card-text text-capitalize"><i class="bi bi-calendar"></i> ' . $event_date . ' | ' . htmlspecialchars($location) . ' | ' . htmlspecialchars($mode) . '</p>';
+                        echo '          <p class="text-muted text-capitalize">' . htmlspecialchars($description) . '</p>';
+                        echo '          <a href="event_details.php?id=' . urlencode($event_id) . '" class="btn" style="background-color: #061a60; color: #fff;">Register Now</a>';
+                        echo '      </div>';
+                        echo '  </div>';
                         echo '</div>';
                     }
                 } else {
-                    echo "No events found.";
+                    echo "<div class='col-12'><p>No events found.</p></div>";
                 }
+                
                 $conn->close();
 
              ?>

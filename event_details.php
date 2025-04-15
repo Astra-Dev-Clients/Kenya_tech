@@ -33,19 +33,24 @@ $event = $result->fetch_assoc();
 // check event details eg date, location, description, cost, mode, created_at
 
 if ($event) {
-    $event_date = $event['Event_Date'];
-    $event_poster = $event['poster'];
-    $event_title = $event['title'];
-    $event_location = $event['location'];
-    $event_description = $event['description'];
-    $event_cost = $event['cost'];
-    $event_mode = $event['mode'];
-    $created_at = $event['created_at'];
-} else {
-    echo "Event not found.";
-    exit;
-}
+  $event_date = $event['Event_Date'];
+  $event_poster = $event['poster'];
+  $event_title = $event['title'];
+  $event_location = $event['location'];
+  $event_description = $event['description'];
+  $event_general = $event['General_Admission'];
+  $event_vip = $event['VIP'];
+  $event_early = $event['Early_Bird'];
+  $event_mode = $event['mode'];
+  $general_privileges = $event['General_Admission_previledges'];
+  $vip_privileges = $event['VIP_previledges'];
+  $early_privileges = $event['Early_Bird_previledges'];
 
+  $created_at = $event['created_at'];
+} else {
+  echo "Event not found.";
+  exit;
+}
 
 
 ?>
@@ -104,7 +109,7 @@ if ($event) {
             <div class="collapse navbar-collapse" id="navbarScroll">
                 <ul class="navbar-nav me-auto ms-auto my-2 my-lg-0 gap-4 navbar-nav-scroll">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a class="nav-link active" aria-current="page" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="">About</a>
@@ -154,7 +159,7 @@ if ($event) {
 
   <!-- Hero Section -->
   <div class="text-center  mb-5 d-flex flex-column align-items-center justify-content-center">
-    <img src="admin/<?=$event_poster?>" alt="Event Poster" class="img-fluid rounded-4 shadow mb-4" style="max-height: 400px; object-fit: cover;">
+    <img src="assets/img/events/<?=$event_poster?>" alt="Event Poster" class="img-fluid rounded-4 shadow mb-4" style="max-height: 400px; object-fit: cover;">
     <h1 class="display-5 fw-bold text-primary"><?= $event_title ?></h1>
     <p class="lead text-muted"><?= $event_description ?></p>
   </div>
@@ -181,8 +186,16 @@ if ($event) {
             <h5><?= $created_at ?></h5>
           </div>
           <div class="col-sm-6 mb-3">
-            <p class="mb-1 text-muted">Cost</p>
-            <h5><?= $event_cost ?></h5>
+            <p class="mb-1 text-muted">General Admission</p>
+            <h5>Ksh <?= number_format($event_general, 2) ?></h5>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <p class="mb-1 text-muted">VIP</p>
+            <h5>Ksh <?= number_format($event_vip, 2) ?></h5>
+          </div>
+          <div class="col-sm-6 mb-3">
+            <p class="mb-1 text-muted">Early Bird</p>
+            <h5>Ksh <?= number_format($event_early, 2) ?></h5>
           </div>
           <div class="col-sm-6 mb-3">
             <p class="mb-1 text-muted">Tickets Available</p>
@@ -204,14 +217,17 @@ if ($event) {
           <h5 class="fw-semibold text-primary">General Admission</h5>
         </div>
         <div class="card-body text-center">
-          <h2 class="text-primary mb-3">Ksh 2000 <small class="text-muted fs-6">/mo</small></h2>
+          <h2 class="text-primary mb-3">Ksh <?= number_format($event_general, 2) ?> <small class="text-muted fs-6">/ticket</small></h2>
           <ul class="list-unstyled mb-4">
-            <li>10 users included</li>
-            <li>2 GB storage</li>
-            <li>Email support</li>
-            <li>Help center access</li>
+            <?php foreach (explode("\n", $general_privileges) as $item): ?>
+              <li><?= htmlspecialchars($item) ?></li>
+            <?php endforeach; ?>
           </ul>
-          <button class="btn btn-outline-primary w-100">Buy Ticket</button>
+          <form action="https://f299-41-203-221-125.ngrok-free.app/clients/kenya_tech/payment" method="GET">
+          <input type="hidden" name="event" value="<?= $event_id ?>">
+          <input type="hidden" name="amount" value="<?= $event_early ?>">
+          <button type="submit"  class="btn btn-outline-primary  w-100">Buy Ticket</button>
+          </form>
         </div>
       </div>
     </div>
@@ -223,33 +239,40 @@ if ($event) {
           <h5 class="fw-semibold">VIP</h5>
         </div>
         <div class="card-body text-center">
-          <h2 class="text-warning mb-3">Ksh 4000 <small class="text-muted fs-6">/mo</small></h2>
+          <h2 class="text-warning mb-3">Ksh <?= number_format($event_vip, 2) ?> <small class="text-muted fs-6">/ticket</small></h2>
           <ul class="list-unstyled mb-4">
-            <li>20 users included</li>
-            <li>10 GB storage</li>
-            <li>Priority support</li>
-            <li>Help center access</li>
+            <?php foreach (explode("\n", $vip_privileges) as $item): ?>
+              <li><?= htmlspecialchars($item) ?></li>
+            <?php endforeach; ?>
           </ul>
-          <button class="btn btn-outline-warning  w-100">Buy Ticket</button>
+          <form action="https://f299-41-203-221-125.ngrok-free.app/clients/kenya_tech/payment" method="GET">
+          <input type="hidden" name="event" value="<?= $event_id ?>">
+          <input type="hidden" name="amount" value="<?= $event_early ?>">
+          <button type="submit"  class="btn btn-outline-primary  w-100">Buy Ticket</button>
+          </form>
         </div>
       </div>
     </div>
 
-    <!-- Enterprise -->
+    <!-- Early Bird -->
     <div class="col">
       <div class="card h-100 shadow-sm border-primary rounded-4">
         <div class="card-header bg-primary text-white py-3 text-center">
-          <h5 class="fw-semibold">Enterprise</h5>
+          <h5 class="fw-semibold">Early Bird</h5>
         </div>
         <div class="card-body text-center">
-          <h2 class="text-primary mb-3">Ksh 3000 <small class="text-warning fs-6">/mo</small></h2>
+          <h2 class="text-primary mb-3">Ksh <?= number_format($event_early, 2) ?> <small class="text-warning fs-6">/ticket</small></h2>
           <ul class="list-unstyled mb-4 text-dark">
-            <li>30 users included</li>
-            <li>15 GB storage</li>
-            <li>Phone & email support</li>
-            <li>Help center access</li>
+            <?php foreach (explode("\n", $early_privileges) as $item): ?>
+              <li><?= htmlspecialchars($item) ?></li>
+            <?php endforeach; ?>
           </ul>
-          <button class="btn btn-outline-primary  w-100">Buy Ticket</button>
+
+          <form action="https://f299-41-203-221-125.ngrok-free.app/clients/kenya_tech/payment" method="GET">
+          <input type="hidden" name="event" value="<?= $event_id ?>">
+          <input type="hidden" name="amount" value="<?= $event_early ?>">
+          <button type="submit"  class="btn btn-outline-primary  w-100">Buy Ticket</button>
+          </form>
         </div>
       </div>
     </div>
@@ -269,16 +292,6 @@ if ($event) {
     <a href="#" class="btn btn-outline-success"><i class="bi bi-whatsapp"></i> WhatsApp</a>
   </div>
 </section>
-
-
-
-
-
-
-
-
-
-
 
 
 

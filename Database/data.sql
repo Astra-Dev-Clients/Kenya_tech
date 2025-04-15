@@ -33,8 +33,13 @@ CREATE TABLE events (
     title VARCHAR(255) NOT NULL,
     location VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    cost DECIMAL(10,2),
-    General Admission DECIMAL (10,2),
+    General_Admission DECIMAL (10,2),
+    VIP DECIMAL (10,2),
+    Early_Bird DECIMAL (10,2),
+    General_Admission_previledges text NOT NULL,
+    VIP_previledges text NOT NULL,
+    Early_Bird_previledges text NOT NULL,
+    status ENUM('upcoming', 'ongoing', 'completed') DEFAULT 'upcoming',
     mode ENUM('physical', 'online'),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (organizer_id) REFERENCES users(SN)
@@ -44,8 +49,39 @@ CREATE TABLE events (
 
 
 
+CREATE TABLE event_attendees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    user_id INT NOT NULL,
+    ticket_type ENUM('General Admission', 'VIP', 'Early Bird') NOT NULL,
+    ticket_price DECIMAL(10,2) NOT NULL,
+    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES events(id),
+    FOREIGN KEY (user_id) REFERENCES users(SN)
+);
 
 
+CREATE TABLE event_comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    user_id INT NOT NULL,
+    comment TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES events(id),
+    FOREIGN KEY (user_id) REFERENCES users(SN)
+);
+
+
+CREATE TABLE tickets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    user_id INT NOT NULL,
+    ticket_type ENUM('General Admission', 'VIP', 'Early Bird') NOT NULL,
+    ticket_price DECIMAL(10,2) NOT NULL,
+    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES events(id),
+    FOREIGN KEY (user_id) REFERENCES users(SN)
+);
 
 
 

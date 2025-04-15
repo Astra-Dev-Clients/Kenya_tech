@@ -23,87 +23,96 @@ $email = htmlspecialchars($details->Email, ENT_QUOTES, 'UTF-8'); // Sanitize out
 
 
 
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+// Check if form was submitted
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    // Assume user is logged in and their ID is stored in session
-    $organizerId = $id; // e.g., from session
+    // generate event id    
+    $event_id = uniqid('event_'); // Generate a unique event ID
+    // Check if the event ID already exists in the database
+    $check_event_id = $conn->prepare("SELECT * FROM events WHERE event_id = ?");
+    $check_event_id->bind_param("s", $event_id);
+    $check_event_id->execute();
+    $result = $check_event_id->get_result();
+    if ($result->num_rows > 0) {
+        // If it exists, generate a new one
+        $event_id = uniqid('event_');
+    }
+    $check_event_id->close();
 
-    // Generate unique event ID
-    $eventId = uniqid("event_", true);
+
+    // Collect and sanitize input data
+    $organizer_id = $id; // Assuming the organizer ID is the same as the logged-in user ID
+    $title = trim($_POST['event-title']);
+    $event_date = $_POST['event-date'];
+    $location = trim($_POST['event-location']);
+    $description = trim($_POST['event-description']);
+    $general_price = $_POST['general-price'];
+    $vip_price = $_POST['vip-price'];
+    $early_price = $_POST['early-price'];
+    $general_priv = trim($_POST['general-privileges']);
+    $vip_priv = trim($_POST['vip-privileges']);
+    $early_priv = trim($_POST['early-privileges']);
+    $mode = $_POST['event-mode'];
+    $status = $_POST['status'];
 
     // Handle file upload
-    $posterTmp = $_FILES['event-poster']['tmp_name'];
-    $fileExt = pathinfo($_FILES['event-poster']['name'], PATHINFO_EXTENSION);
-    $posterNewName = $eventId . "." . $fileExt;
-    $posterPath = "uploads/" . $posterNewName;
+    if (isset($_FILES['event-poster']) && $_FILES['event-poster']['error'] === 0) {
+        $poster = $_FILES['event-poster'];
+        $poster_name = uniqid('poster_') . "_" . basename($poster['name']);
+        $target_dir = "../Assets/Img/events/"; // Make sure this folder exists
+        $target_file = $target_dir . $poster_name;
 
-    if (move_uploaded_file($posterTmp, $posterPath)) {
-        // Collect and sanitize form inputs
-        $Event_Date = $_POST['Event-date'];
-        $title = $_POST['event-title'];
-        $location = $_POST['event-location'];
-        $description = $_POST['event-description'];
-        $cost = floatval($_POST['event-cost']);
-        $mode = $_POST['event-mode'];
-
-
-        // Prepare insert statement
-        $stmt = $conn->prepare("INSERT INTO events ( Event_Date,event_id, organizer_id, poster, title, location, description, cost, mode) 
-                                VALUES (?,?, ?, ?, ?, ?, ?, ?, ?)");
-        if ($stmt) {
-            $stmt->bind_param("ssissssds", $Event_Date, $eventId, $organizerId, $posterPath, $title, $location, $description, $cost, $mode);
-
-            if ($stmt->execute()) {
-                       // Success message
-        echo '
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Success</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-            <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            <style>
-                body {
-                    height: 100vh;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    background-color: #f8f9fa;
-                }
-                .alert-container {
-                    max-width: 500px;
-                    width: 100%;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="alert-container">
-                <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-                    <h2 class="mb-2">✅ <strong>Success!</strong></h2>
-                    Event created successfully.
-                    <br>
-                    <button type="button" class="btn btn-success mt-3" onclick="window.location.href=\'./home.php\'">Go to Dashboard</button>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        </body>
-        </html>
-        ';
-        // exit();
-            } else {
-                echo "Execute error: " . $stmt->error;
-            }
-
-            $stmt->close();
+        // Move uploaded file
+        if (move_uploaded_file($poster["tmp_name"], $target_file)) {
+            // File uploaded successfully
         } else {
-            echo "Prepare error: " . $conn->error;
+            die("Failed to upload poster.");
         }
     } else {
-        echo "Failed to upload poster.";
+        die("Poster upload error.");
     }
+
+    // Prepare and bind
+    $stmt = $conn->prepare("INSERT INTO events (
+        Event_Date, event_id, organizer_id, poster, title, location, description,
+        General_Admission, VIP, Early_Bird,
+        General_Admission_previledges, VIP_previledges, Early_Bird_previledges,
+        status, mode
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+    $stmt->bind_param(
+        "ssisssssdddssss",
+        $event_date,
+        $event_id,
+        $organizer_id,
+        $poster_name,
+        $title,
+        $location,
+        $description,
+        $general_price,
+        $vip_price,
+        $early_price,
+        $general_priv,
+        $vip_priv,
+        $early_priv,
+        $status,
+        $mode
+    );
+
+    // Execute
+    if ($stmt->execute()) {
+        echo "Event created successfully!";
+        // Redirect or show success page
+        header("Location: success.php");
+        exit();
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
+    $conn->close();
+} else {
+    echo "Invalid request.";
 }
 
 ?>
@@ -571,56 +580,103 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <h3 class="text-center title-2">Create Event</h3>
                             </div>
                             <hr>
-                            <form action="add_event.php" method="post" enctype="multipart/form-data" novalidate="novalidate">
-                            <div class="form-group">
-                                    <label for="event-poster" class="control-label mb-1">Event Poster</label>
-                                    <div class="drop-zone" id="drop-zone">
-                                        <p>Drag & drop poster here or click to upload</p>
-                                        <input type="file" name="event-poster" id="event-poster" class="form-control-file" accept="image/*" hidden required>
-                                        <img id="preview" src="#" alt="Preview" style="display: none;" />
-                                    </div>
-                                    <small class="form-text text-muted">Recommended size: 2687px × 1535px</small>
+    <form action="add_event.php" method="post" enctype="multipart/form-data" novalidate="novalidate">
+    <!-- Event Poster -->
+    <div class="form-group">
+        <label for="event-poster" class="control-label mb-1">Event Poster</label>
+        <div class="drop-zone" id="drop-zone">
+            <p>Drag & drop poster here or click to upload</p>
+            <input type="file" name="event-poster" id="event-poster" class="form-control-file" accept="image/*" hidden required>
+            <img id="preview" src="#" alt="Preview" style="display: none;" />
+        </div>
+        <small class="form-text text-muted">Recommended size: 2687px × 1535px</small>
+    </div>
 
-                                </div>
-                                <div class="form-group">
-                                    <label for="event-title" class="control-label mb-1">Event Title</label>
-                                    <input id="event-title" name="event-title" type="text" class="form-control" required placeholder="Enter event title">
-                                </div>
+    <!-- Event Title -->
+    <div class="form-group">
+        <label for="event-title" class="control-label mb-1">Event Title</label>
+        <input id="event-title" name="event-title" type="text" class="form-control" required placeholder="Enter event title">
+    </div>
 
-                                <!-- event date -->
-                                <div class="form-group">
-                                    <label for="event-date" class="control-label mb-1">Event Date</label>
-                                    <input id="Event-date" name="Event-date" type="datetime-local" class="form-control" required placeholder="Enter event Date">
-                                </div>
+    <!-- Event Date -->
+    <div class="form-group">
+        <label for="event-date" class="control-label mb-1">Event Date</label>
+        <input id="event-date" name="event-date" type="datetime-local" class="form-control" required>
+    </div>
 
+    <!-- Location -->
+    <div class="form-group">
+        <label for="event-location" class="control-label mb-1">Location</label>
+        <input id="event-location" name="event-location" type="text" class="form-control" required placeholder="Event location">
+    </div>
 
-                                <div class="form-group">
-                                    <label for="event-location" class="control-label mb-1">Location</label>
-                                    <input id="event-location" name="event-location" type="text" class="form-control" required placeholder="Event location">
-                                </div>
-                                <div class="form-group">
-                                    <label for="event-description" class="control-label mb-1">Description</label>
-                                    <textarea id="event-description" name="event-description" class="form-control" rows="4" required placeholder="Describe your event..."></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="event-cost" class="control-label mb-1">Cost (Ksh)</label>
-                                    <input id="event-cost" name="event-cost" type="number" class="form-control" required placeholder="e.g. 20">
-                                </div>
-                                <div class="form-group">
-                                    <label for="event-mode" class="control-label mb-1">Mode</label>
-                                    <select id="event-mode" name="event-mode" class="form-control" required>
-                                        <option value="">-- Select Mode --</option>
-                                        <option value="physical">Physical</option>
-                                        <option value="online">Online</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <button id="event-submit-button" type="submit" class="btn btn-lg btn-primary btn-block">
-                                        <i class="fa fa-calendar-check-o fa-lg"></i>&nbsp;
-                                        <span id="submit-button-text">Submit Event</span>
-                                    </button>
-                                </div>
-                            </form>
+    <!-- Description -->
+    <div class="form-group">
+        <label for="event-description" class="control-label mb-1">Description</label>
+        <textarea id="event-description" name="event-description" class="form-control" rows="4" required placeholder="Describe your event..."></textarea>
+    </div>
+
+    <!-- Ticket Prices -->
+    <div class="form-group">
+        <label for="general-price" class="control-label mb-1">General Admission Price (Ksh)</label>
+        <input id="general-price" name="general-price" type="number" step="0.01" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+        <label for="vip-price" class="control-label mb-1">VIP Price (Ksh)</label>
+        <input id="vip-price" name="vip-price" type="number" step="0.01" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+        <label for="early-price" class="control-label mb-1">Early Bird Price (Ksh)</label>
+        <input id="early-price" name="early-price" type="number" step="0.01" class="form-control" required>
+    </div>
+
+    <!-- Ticket Privileges -->
+    <div class="form-group">
+        <label for="general-privileges" class="control-label mb-1">General Admission Privileges</label>
+        <textarea id="general-privileges" name="general-privileges" class="form-control" rows="2" required></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="vip-privileges" class="control-label mb-1">VIP Privileges</label>
+        <textarea id="vip-privileges" name="vip-privileges" class="form-control" rows="2" required></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="early-privileges" class="control-label mb-1">Early Bird Privileges</label>
+        <textarea id="early-privileges" name="early-privileges" class="form-control" rows="2" required></textarea>
+    </div>
+
+    <!-- Mode -->
+    <div class="form-group">
+        <label for="event-mode" class="control-label mb-1">Mode</label>
+        <select id="event-mode" name="event-mode" class="form-control" required>
+            <option value="">-- Select Mode --</option>
+            <option value="physical">Physical</option>
+            <option value="online">Online</option>
+        </select>
+    </div>
+
+    <!-- Status -->
+    <div class="form-group">
+        <label for="status" class="control-label mb-1">Event Status</label>
+        <select id="status" name="status" class="form-control">
+            <option value="upcoming" selected>Upcoming</option>
+            <option value="ongoing">Ongoing</option>
+            <option value="completed">Completed</option>
+        </select>
+    </div>
+
+    <!-- Submit Button -->
+    <div>
+        <button id="event-submit-button" type="submit" class="btn btn-lg btn-primary btn-block">
+            <i class="fa fa-calendar-check-o fa-lg"></i>&nbsp;
+            <span id="submit-button-text">Submit Event</span>
+        </button>
+    </div>
+</form>
+
                         </div>
                     </div>
                 </div>
