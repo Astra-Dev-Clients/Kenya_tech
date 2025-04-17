@@ -1,13 +1,75 @@
 <?php
 use Dotenv\Dotenv;
 require '../vendor/autoload.php';
-
 require_once '../Database/db.php';
 
 // Load environment variables
-$dotenv = Dotenv::createImmutable('../');
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
+
+// Setup Google Client
+$attendee = new Google\Client();
+$attendee->setClientId($_ENV['ATTENDEE_GOOGLE_CLIENT_ID']);
+$attendee->setClientSecret($_ENV['ATTENDEE_GOOGLE_CLIENT_SECRET']);
+$attendee->setRedirectUri($_ENV['ATTENDEE_GOOGLE_REDIRECT_URI']);
+$attendee->addScope("email");
+$attendee->addScope("profile");
+$url_attendee = $attendee->createAuthUrl();
+
+
+
+// Start session
+session_start();
+// Check session for authentication
+if (!isset($_SESSION['google_auth']) && !isset($_SESSION['email_auth'])) {
+      if (isset($_GET['event']) && isset($_GET['amount'])) {
+        $_SESSION['pending_event'] = $_GET['event'];
+        $_SESSION['pending_amount'] = $_GET['amount'];
+        $_SESSION['pending_title'] = $_GET['title'] ?? '';
+    }
+    header('Location: '.$url_attendee.'');
+    exit();
+}
+
+// Get user ID from session
+$id = $_SESSION['google_auth'] ?? $_SESSION['email_auth'];
+
+// If you're using Google UID, change query accordingly
+// For example: SELECT * FROM users WHERE google_uid = ?
+$stmt = $conn->prepare("SELECT * FROM users WHERE SN = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$details = $result->fetch_object();
+
+// If user not found
+if (!$details) {
+    header('Location: ../index.php?error=user_not_found');
+    exit();
+}
+
+// Sanitize output
+$profileImage = htmlspecialchars($details->Avatar ?? '', ENT_QUOTES, 'UTF-8');
+$name = htmlspecialchars($details->First_Name ?? '', ENT_QUOTES, 'UTF-8');
+$email = htmlspecialchars($details->Email ?? '', ENT_QUOTES, 'UTF-8');
+
+// Check if event and amount are set
+if (!isset($_GET['event']) || !isset($_GET['amount'])) {
+    header('Location: ../index.php');
+    exit();
+}
+
+
+$amount = isset($_GET['amount']) ? (float)$_GET['amount'] : 0;
+$event = isset($_GET['event']) ? htmlspecialchars($_GET['event']) : '';
+$event_title = isset($_GET['title']) ? htmlspecialchars($_GET['title']) : '';
+
+
+
+// get event details
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  
+
 // Configs
 $consumerKey = $_ENV['MPESA_CONSUMER_KEY'];
 $consumerSecret = $_ENV['MPESA_CONSUMER_SECRET'];
@@ -47,7 +109,6 @@ if ($event) {
 
 
 
-
 // 1. Get Access Token
 $url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
 $credentials = base64_encode("$consumerKey:$consumerSecret");
@@ -74,7 +135,7 @@ $data = [
   'PartyA' => $phone,
   'PartyB' => $BusinessShortCode,
   'PhoneNumber' => $phone,
-  'CallBackURL' => 'https://fe4b-41-203-221-125.ngrok-free.app/clients/kenya_tech/payment/mpesa_callback.php',
+  'CallBackURL' => 'https://802c-41-212-26-7.ngrok-free.app/payment/mpesa_callback.php',
   'AccountReference' =>  $event_title,
   'TransactionDesc' => 'Event Payment'
 ];
@@ -114,17 +175,20 @@ echo "
 </div>
 ";
 
+// refresh the page to show the payment status
+ 
 
 }
-
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Payment Options | Kenya Tech Events</title>
+  <title>M-Pesa Payment | Kenya Tech Events</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -133,11 +197,6 @@ echo "
     .payment-card {
       transition: transform 0.2s ease-in-out;
       cursor: pointer;
-    }
-    .payment-card:hover {
-      transform: scale(1.03);
-    }
-    .selected {
       border: 3px solid #007bff;
       background-color: #e6f0ff;
     }
@@ -146,86 +205,26 @@ echo "
 <body>
 
 <div class="container py-5">
-  <h2 class="text-center mb-4">Choose Your Payment Method</h2>
+  <h2 class="text-center mb-4">Pay with M-Pesa</h2>
   <div class="row justify-content-center">
-
-     <!-- M-Pesa Option -->
-    <div class="col-md-4 mb-3">
-      <div class="card payment-card text-center p-4" id="mpesaOption">
-        <img src="../assets/img/logos/mpesa-logo.png" alt="M-Pesa" class="mb-3" width="60" height="auto">
-        <h5>Pay with M-Pesa</h5>
+    <div class="col-md-6">
+      <div class="card payment-card text-center p-4 mb-4">
+        <img src="../assets/img/logos/mpesa-logo.png" alt="M-Pesa" class="mb-3" width="60">
+        <h5>M-Pesa Payment for <?= $event_title ?> (KES <?= $amount ?>)</h5>
       </div>
-    </div>
 
-
-    <!-- Credit Card Option -->
-    <div class="col-md-4 mb-3">
-      <div class="card payment-card text-center p-4" id="creditCardOption">
-        <img src="../assets/img/logos/creditcard-logo.jpg" alt="Credit Card" class="mb-3" width="60" height="auto">
-        <h5>Pay with Credit/Debit Card</h5>
-      </div>
-    </div>
-
-
-  </div>
-
-  <!-- Placeholder for selected form -->
-  <div id="paymentForm" class="mt-4"></div>
-</div>
-
-<script>
-  const creditCardOption = document.getElementById('creditCardOption');
-  const mpesaOption = document.getElementById('mpesaOption');
-  const paymentForm = document.getElementById('paymentForm');
-
-  const clearSelection = () => {
-    creditCardOption.classList.remove('selected');
-    mpesaOption.classList.remove('selected');
-  };
-
-  creditCardOption.addEventListener('click', () => {
-    clearSelection();
-    creditCardOption.classList.add('selected');
-    paymentForm.innerHTML = `
       <div class="card p-4">
-        <h5 class="mb-3">Credit/Debit Card Details</h5>
-        <form>
+        <form method="POST" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>?event=<?= $event ?>&amount=<?= $amount ?>">
           <div class="mb-3">
-            <label for="cardNumber" class="form-label">Card Number</label>
-            <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456">
+            <label for="mpesaNumber" class="form-label">M-Pesa Phone Number</label>
+            <input type="text" name="phone" class="form-control" id="mpesaNumber" placeholder="2547XX XXX XXX" required>
           </div>
-          <div class="mb-3 row">
-            <div class="col">
-              <label for="expiry" class="form-label">Expiry Date</label>
-              <input type="text" class="form-control" id="expiry" placeholder="MM/YY">
-            </div>
-            <div class="col">
-              <label for="cvv" class="form-label">CVV</label>
-              <input type="text" class="form-control" id="cvv" placeholder="123">
-            </div>
-          </div>
-          <button type="submit" class="btn btn-primary w-100">Pay Now</button>
+          <button type="submit" class="btn btn-success w-100">Pay with M-Pesa</button>
         </form>
-      </div>`;
-  });
-
-  mpesaOption.addEventListener('click', () => {
-    clearSelection();
-    mpesaOption.classList.add('selected');
-    paymentForm.innerHTML = `
-   <div class="card p-4">
-    <h5 class="mb-3">M-Pesa Payment</h5>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>?event=<?= $_GET['event'] ?>&amount=<?= (float)$_GET['amount'] ?>" method="POST">
-      <div class="mb-3">
-        <label for="mpesaNumber" class="form-label">M-Pesa Phone Number</label>
-        <input type="text" name="phone" class="form-control" id="mpesaNumber" placeholder="07XX XXX XXX">
       </div>
-      <button type="submit" class="btn btn-success w-100">Pay with M-Pesa</button>
-    </form>
-  </div>`;
-  });
-</script>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
-

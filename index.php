@@ -107,7 +107,7 @@ $url = $client->createAuthUrl();
                         <a class="nav-link" href="#">Resources</a>
                     </li>
                 </ul>
-                <a href="<?=$url?>" class="btn text-white" style="background-color:#061a60;">Get Started</a>
+                <a href="<?=$url?>" class="btn text-white" style="background-color:#061a60;">Create an Event</a>
             </div>
         </div>
     </nav>

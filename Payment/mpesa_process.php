@@ -73,7 +73,7 @@ $data = [
   'PartyA' => $phone,
   'PartyB' => $BusinessShortCode,
   'PhoneNumber' => $phone,
-  'CallBackURL' => 'https://fe4b-41-203-221-125.ngrok-free.app/clients/kenya_tech/payment/mpesa_callback.php',
+  'CallBackURL' => 'https://ab1b-41-212-26-7.ngrok-free.app/clients/kenya_tech/payment/mpesa_callback.php',
   'AccountReference' =>  $event_title,
   'TransactionDesc' => 'Event Payment'
 ];

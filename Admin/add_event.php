@@ -769,28 +769,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
     if (file && file.type.startsWith("image/")) {
-        const img = new Image();
-        const objectUrl = URL.createObjectURL(file);
-
-        img.onload = function () {
-            if (img.width === 2687 && img.height === 1535) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    preview.src = e.target.result;
-                    preview.style.display = "block";
-                };
-                reader.readAsDataURL(file);
-            } else {
-                alert("Image must be 2687x1535 pixels!");
-                fileInput.value = ""; // Reset file input
-                preview.style.display = "none";
-            }
-            URL.revokeObjectURL(objectUrl);
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.src = e.target.result;
+            preview.style.display = "block";
         };
-
-        img.src = objectUrl;
+        reader.readAsDataURL(file);
     }
 });
+
 
 </script>
 

@@ -52,6 +52,7 @@ try {
             $email = htmlspecialchars($userinfo['email'], ENT_QUOTES, 'UTF-8');
             $picture = htmlspecialchars($userinfo['picture'], ENT_QUOTES, 'UTF-8');
 
+
             include('../Database/db.php');
             $check = "SELECT * FROM users WHERE Email = '$email'";
             $check_query = mysqli_query($conn, $check);

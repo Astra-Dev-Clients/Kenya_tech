@@ -7,7 +7,6 @@ include './vendor/autoload.php';
 require_once './Database/db.php';
 
 session_start();
-
 $dotenv = Dotenv::createImmutable('./');
 $dotenv->load();
 
@@ -18,6 +17,8 @@ $client->setRedirectUri($_ENV['GOOGLE_REDIRECT_URI']);
 $client->addScope("email");
 $client->addScope("profile");
 $url = $client->createAuthUrl();
+
+
 
 // Check if the user is logged in
 
@@ -139,7 +140,7 @@ if ($event) {
                         <a class="nav-link" href="#">Resources</a>
                     </li>
                 </ul>
-                <a href="<?=$url?>" class="btn text-white" style="background-color:#061a60;">Get Started</a>
+                <a href="<?=$url?>" class="btn text-white" style="background-color:#061a60;">Create Event</a>
             </div>
         </div>
     </nav>
@@ -223,11 +224,8 @@ if ($event) {
               <li><?= htmlspecialchars($item) ?></li>
             <?php endforeach; ?>
           </ul>
-          <form action="https://f299-41-203-221-125.ngrok-free.app/clients/kenya_tech/payment" method="GET">
-          <input type="hidden" name="event" value="<?= $event_id ?>">
-          <input type="hidden" name="amount" value="<?= $event_early ?>">
-          <button type="submit"  class="btn btn-outline-primary  w-100">Buy Ticket</button>
-          </form>
+
+          <a href="./payment/index.php?event=<?= $event_id ?>&amount=<?= $event_general ?>&title=<?= urlencode($event_title) ?>&category=General" class="btn btn-outline-primary">Get Ticket</a>
         </div>
       </div>
     </div>
@@ -245,11 +243,8 @@ if ($event) {
               <li><?= htmlspecialchars($item) ?></li>
             <?php endforeach; ?>
           </ul>
-          <form action="https://f299-41-203-221-125.ngrok-free.app/clients/kenya_tech/payment" method="GET">
-          <input type="hidden" name="event" value="<?= $event_id ?>">
-          <input type="hidden" name="amount" value="<?= $event_early ?>">
-          <button type="submit"  class="btn btn-outline-primary  w-100">Buy Ticket</button>
-          </form>
+  
+          <a href="./payment/index.php?event=<?= $event_id ?>&amount=<?= $event_vip ?>&title=<?= urlencode($event_title) ?>&category=VIP" class="btn btn-outline-danger">Get VIP Ticket</a>
         </div>
       </div>
     </div>
@@ -268,11 +263,7 @@ if ($event) {
             <?php endforeach; ?>
           </ul>
 
-          <form action="https://f299-41-203-221-125.ngrok-free.app/clients/kenya_tech/payment" method="GET">
-          <input type="hidden" name="event" value="<?= $event_id ?>">
-          <input type="hidden" name="amount" value="<?= $event_early ?>">
-          <button type="submit"  class="btn btn-outline-primary  w-100">Buy Ticket</button>
-          </form>
+          <a href="./payment/index.php?event=<?= $event_id ?>&amount=<?= $event_early ?>&title=<?= urlencode($event_title) ?>&category=Early Bird" class="btn btn-outline-warning">Get Early Bird Ticket</a>
         </div>
       </div>
     </div>
@@ -285,12 +276,42 @@ if ($event) {
 
   <!-- Share Buttons -->
   <div class="text-center my-4">
-    <h5>Share this event:</h5>
-    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-facebook"></i> Facebook</a>
-    <a href="#" class="btn btn-outline-info me-2"><i class="bi bi-twitter-x"></i> Twitter</a>
-    <a href="#" class="btn btn-outline-danger me-2"><i class="bi bi-instagram"></i> Instagram</a>
-    <a href="#" class="btn btn-outline-success"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-  </div>
+  <h5>Share this event:</h5>
+  <a id="facebook-share" href="javascript:void(0)" target="_blank" class="btn btn-outline-primary me-2">
+  <i class="bi bi-facebook"></i> Facebook
+  </a>
+  <a id="twitter-share" href="#" target="_blank" class="btn btn-outline-info me-2">
+    <i class="bi bi-twitter-x"></i> Twitter
+  </a>
+  <a id="instagram-share" href="#" target="_blank" class="btn btn-outline-danger me-2">
+    <i class="bi bi-instagram"></i> Instagram
+  </a>
+  <a id="whatsapp-share" href="#" target="_blank" class="btn btn-outline-success">
+    <i class="bi bi-whatsapp"></i> WhatsApp
+  </a>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const pageUrl = encodeURIComponent(window.location.href);
+    const pageTitle = encodeURIComponent(document.title);
+    const eventTitle = <?php echo json_encode($event_title); ?>;
+
+    document.getElementById('facebook-share').href =
+      `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`;
+
+    document.getElementById('twitter-share').href =
+      `https://twitter.com/intent/tweet?url=${pageUrl}&text=${pageTitle}`;
+
+    document.getElementById('instagram-share').href =
+      `https://www.instagram.com/`;
+
+    document.getElementById('whatsapp-share').href =
+      `https://api.whatsapp.com/send?text=Buy Tickets for ${encodeURIComponent(eventTitle)}%0A${pageUrl}`;
+  });
+</script>
+
+
 </section>
 
 
@@ -388,8 +409,6 @@ img.img-fluid.rounded:hover {
 
     <!-- Boostrap Js -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-    <!-- <script src="./assets/dist/js/bootstrap.bundle.min.js"></script> -->
 
 </body>
 

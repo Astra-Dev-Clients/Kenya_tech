@@ -15,6 +15,18 @@ CREATE TABLE `users` (
 );
 
 
+create TABLE event_attendees (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    user_id INT NOT NULL,
+    ticket_type ENUM('General Admission', 'VIP', 'Early Bird') NOT NULL,
+    ticket_price DECIMAL(10,2) NOT NULL,
+    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES events(id),
+    FOREIGN KEY (user_id) REFERENCES users(SN)
+);
+
+
 CREATE TABLE user_tokens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -49,16 +61,6 @@ CREATE TABLE events (
 
 
 
-CREATE TABLE event_attendees (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    event_id INT NOT NULL,
-    user_id INT NOT NULL,
-    ticket_type ENUM('General Admission', 'VIP', 'Early Bird') NOT NULL,
-    ticket_price DECIMAL(10,2) NOT NULL,
-    purchase_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (event_id) REFERENCES events(id),
-    FOREIGN KEY (user_id) REFERENCES users(SN)
-);
 
 
 CREATE TABLE event_comments (
